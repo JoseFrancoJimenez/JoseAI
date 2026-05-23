@@ -1,0 +1,8 @@
+{
+  "name": "playwright",
+  "description": "Browser automation MCP server. Gives the assistant the ability to navigate, screenshot, click, and interact with live web pages.",
+  "package": "@playwright/mcp@latest",
+  "command": "npx",
+  "args": ["@playwright/mcp@latest"],
+  "registeredIn": ".claude/settings.json"
+}
