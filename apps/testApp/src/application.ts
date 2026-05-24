@@ -10,8 +10,8 @@ import type { VectorLayerConfig } from '@lib/openLayers/layers/types.ts';
 import { BaseComponent } from './components/base-component.ts';
 import { MapControlsComponent } from './components/map-controls.ts';
 
-import provincesConfig from '@lib/openLayers/testFiles/layers/provinces.json';
-import pointsConfig from '@lib/openLayers/testFiles/layers/points.json';
+import provincesConfig from './testData/layers/provinces.json';
+import pointsConfig from './testData/layers/points.json';
 
 const CANADA_EXTENT = transformExtent([-141.0, 41.7, -60.6, 78.1], 'EPSG:4326', 'EPSG:3857');
 

@@ -2,7 +2,7 @@
   "type": "vector",
   "id": "points",
   "label": "Sample Points",
-  "source": { "type": "geojson", "url": "/lib/openLayers/testFiles/sourceLayers/test-points.geojson" },
+  "source": { "type": "geojson", "url": "/testData/sourceLayers/test-points.geojson" },
   "visible": true,
   "fields": [
     { "id": "name",        "label": "City" },

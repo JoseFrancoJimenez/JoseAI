@@ -1,5 +1,5 @@
 import type { Subscription } from '../../components/evented.ts';
-import { createMap, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
+import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
 import { createAppLayer, createNativeLayer } from './layerFactory.ts';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
@@ -43,10 +43,10 @@ export class AppMap {
     if (config.type === 'vector') {
       const vLayer = layer as VectorAppLayer;
       const nativeVector = native as OLVectorLayer;
-      nativeVector.setStyle(vLayer.variable.renderer[0] as unknown as StyleLike);
+      nativeVector.setStyle(toOLStyle(vLayer.variable.renderer) as unknown as StyleLike);
       subscriptions.push(
         vLayer.on('change:variable', ({ variable }) =>
-          nativeVector.setStyle(variable.renderer[0] as unknown as StyleLike)
+          nativeVector.setStyle(toOLStyle(variable.renderer) as unknown as StyleLike)
         )
       );
     }

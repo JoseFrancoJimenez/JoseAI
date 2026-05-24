@@ -35,3 +35,16 @@ export function extractFillColor(style: Record<string, unknown>): string | undef
   const color = style['circle-fill-color'] ?? style['fill-color'];
   return typeof color === 'string' ? color : undefined;
 }
+
+/**
+ * Converts our renderer array to OL flat style format.
+ * RendererRule objects (with nested `style`, `label`, `else`) are flattened;
+ * plain flat style objects pass through unchanged.
+ */
+export function toOLStyle(renderer: unknown[]): unknown[] {
+  return renderer.map(rule => {
+    if (typeof rule !== 'object' || rule === null || !('style' in (rule as object))) return rule;
+    const { filter, style } = rule as { filter?: unknown; style: Record<string, unknown> };
+    return filter !== undefined ? { filter, ...style } : { ...style };
+  });
+}
