@@ -2,6 +2,6 @@
   "type": "tile",
   "id": "imagery",
   "label": "Canada Base Map - Transportation",
-  "source_url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT3978/MapServer",
+  "source": { "type": "arcgis_tile", "url": "https://maps-cartes.services.geo.ca/server2_serveur2/rest/services/BaseMaps/CBMT3978/MapServer" },
   "visible": true
 }

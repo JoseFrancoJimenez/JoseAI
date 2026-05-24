@@ -5,19 +5,14 @@ import VectorSource from 'ol/source/Vector.js';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import TileArcGISRest from 'ol/source/TileArcGISRest.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
+import EsriJSON from 'ol/format/EsriJSON.js';
 import type OLBaseLayer from 'ol/layer/Base.js';
-import type { StyleLike } from 'ol/style/Style.js';
 
 import type { AppLayer } from '../layers/baseLayer.ts';
 import { VectorAppLayer } from '../layers/vectorLayer.ts';
 import { ImageAppLayer } from '../layers/imageLayer.ts';
 import { TileAppLayer } from '../layers/tileLayer.ts';
-import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig } from '../layers/types.ts';
-
-/** Minimal interface for native vector layers — used by AppMap to sync style changes. */
-export interface INativeVectorLayer {
-  setStyle(style: unknown): void;
-}
+import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig, VectorSourceConfig, WFSSourceConfig } from '../layers/types.ts';
 
 export function createAppLayer(config: LayerConfig): AppLayer {
   switch (config.type) {
@@ -36,27 +31,34 @@ export function createNativeLayer(config: LayerConfig): OLBaseLayer {
 }
 
 function createNativeVectorLayer(config: VectorLayerConfig): OLVectorLayer {
-  const defaultVariable = config.variables.find(v => v.id === config.default_variable);
-  return new OLVectorLayer({
-    source: new VectorSource({ url: config.source_url, format: new GeoJSON() }),
-    style: defaultVariable?.renderer as unknown as StyleLike,
-    visible: config.visible ?? true,
-    opacity: config.opacity ?? 1,
-  });
+  return new OLVectorLayer({ source: createVectorSource(config.source) });
 }
 
 function createNativeImageLayer(config: ImageLayerConfig): OLImageLayer {
   return new OLImageLayer({
-    source: new ImageWMS({ url: config.source_url, params: config.wms_params }),
-    visible: config.visible ?? true,
-    opacity: config.opacity ?? 1,
+    source: new ImageWMS({ url: config.source.url, params: config.source.params }),
   });
 }
 
 function createNativeTileLayer(config: TileLayerConfig): OLTileLayer {
-  return new OLTileLayer({
-    source: new TileArcGISRest({ url: config.source_url }),
-    visible: config.visible ?? true,
-    opacity: config.opacity ?? 1,
+  return new OLTileLayer({ source: new TileArcGISRest({ url: config.source.url }) });
+}
+
+function createVectorSource(source: VectorSourceConfig): VectorSource {
+  switch (source.type) {
+    case 'geojson':  return new VectorSource({ url: source.url, format: new GeoJSON() });
+    case 'esrijson': return new VectorSource({ url: source.url, format: new EsriJSON() });
+    case 'wfs':      return new VectorSource({ url: buildWFSUrl(source), format: new GeoJSON() });
+  }
+}
+
+function buildWFSUrl(source: WFSSourceConfig): string {
+  const params = new URLSearchParams({
+    service: 'WFS',
+    version: source.version ?? '2.0.0',
+    request: 'GetFeature',
+    typeName: source.typeName,
+    outputFormat: 'application/json',
   });
+  return `${source.url}?${params}`;
 }

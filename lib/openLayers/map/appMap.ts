@@ -1,6 +1,8 @@
 import type { Subscription } from '../../components/evented.ts';
 import { createMap, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
-import { createAppLayer, createNativeLayer, type INativeVectorLayer } from './layerFactory.ts';
+import { createAppLayer, createNativeLayer } from './layerFactory.ts';
+import type OLVectorLayer from 'ol/layer/Vector.js';
+import type { StyleLike } from 'ol/style/Style.js';
 import type { AppLayer } from '../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../layers/vectorLayer.ts';
 import type { LayerConfig } from '../layers/types.ts';
@@ -30,15 +32,21 @@ export class AppMap {
     const native = createNativeLayer(config);
     const layer = createAppLayer(config);
 
+    native.setVisible(config.visible ?? true);
+    native.setOpacity(config.opacity ?? 1);
+
     const subscriptions: Subscription[] = [
       layer.on('change:visible', ({ visible }) => native.setVisible(visible)),
       layer.on('change:opacity', ({ opacity }) => native.setOpacity(opacity)),
     ];
 
     if (config.type === 'vector') {
+      const vLayer = layer as VectorAppLayer;
+      const nativeVector = native as OLVectorLayer;
+      nativeVector.setStyle(vLayer.variable.renderer[0] as unknown as StyleLike);
       subscriptions.push(
-        (layer as VectorAppLayer).on('change:variable', ({ variable }) =>
-          (native as unknown as INativeVectorLayer).setStyle(variable.renderer[0])
+        vLayer.on('change:variable', ({ variable }) =>
+          nativeVector.setStyle(variable.renderer[0] as unknown as StyleLike)
         )
       );
     }

@@ -45,20 +45,38 @@ export interface BaseLayerConfig {
   legend?: Partial<Legend>;
 }
 
-/**
- * Configuration for a vector layer
- */
-export interface VectorLayerConfig extends BaseLayerConfig {
-  type: 'vector';
-  source_url: string;
-  fields: FieldConfig[];
-  default_variable: string;
-  variables: VariableConfig[];
+// ── Vector source configs ────────────────────────────────────────────────────
+
+export interface GeoJSONSourceConfig {
+  type: 'geojson';
+  url: string;
 }
 
-/**
- * Parameters for a WMS (Web Map Service) request
- */
+export interface EsriJSONSourceConfig {
+  type: 'esrijson';
+  url: string;
+}
+
+export interface WFSSourceConfig {
+  type: 'wfs';
+  url: string;
+  typeName: string;
+  version?: string;
+}
+
+export type VectorSourceConfig = GeoJSONSourceConfig | EsriJSONSourceConfig | WFSSourceConfig;
+
+// ── Tile source configs ──────────────────────────────────────────────────────
+
+export interface ArcGISTileSourceConfig {
+  type: 'arcgis_tile';
+  url: string;
+}
+
+export type TileSourceConfig = ArcGISTileSourceConfig;
+
+// ── Image source configs ─────────────────────────────────────────────────────
+
 export interface WmsParams {
   LAYERS: string;
   STYLES?: string;
@@ -66,34 +84,38 @@ export interface WmsParams {
   TRANSPARENT?: boolean;
 }
 
-/**
- * Configuration for an image layer backed by WMS
- */
-export interface ImageLayerConfig extends BaseLayerConfig {
-  type: 'image';
-  source_url: string;
-  wms_params: WmsParams;
+export interface WMSSourceConfig {
+  type: 'wms';
+  url: string;
+  params: WmsParams;
 }
 
-/**
- * A rule for rendering features in a layer based on attribute filters, 
- * with an optional label and style overrides.
- * */
+export type ImageSourceConfig = WMSSourceConfig;
+
+// ── Layer configs ────────────────────────────────────────────────────────────
+
+export interface VectorLayerConfig extends BaseLayerConfig {
+  type: 'vector';
+  source: VectorSourceConfig;
+  fields: FieldConfig[];
+  default_variable: string;
+  variables: VariableConfig[];
+}
+
+export interface ImageLayerConfig extends BaseLayerConfig {
+  type: 'image';
+  source: ImageSourceConfig;
+}
+
 export type RendererRule = {
   label?: string;
   filter?: unknown[];
   style?: Record<string, unknown>;
 };
 
-/**
- * Configuration for a tile layer backed by an ArcGIS MapServer REST service
- */
 export interface TileLayerConfig extends BaseLayerConfig {
   type: 'tile';
-  source_url: string;
+  source: TileSourceConfig;
 }
 
-/**
- * Union type for all layer configurations
- */
 export type LayerConfig = VectorLayerConfig | ImageLayerConfig | TileLayerConfig;
