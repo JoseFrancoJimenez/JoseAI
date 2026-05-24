@@ -1,14 +1,11 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+import { join } from 'path';
 
 export default defineConfig({
   root: 'apps/testApp',
   resolve: {
     alias: {
-      '@lib': resolve(__dirname, 'lib'),
+      '@lib': join(process.cwd(), 'lib'),
     },
   },
 });
