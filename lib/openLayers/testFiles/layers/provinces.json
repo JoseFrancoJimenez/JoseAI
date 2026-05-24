@@ -2,7 +2,7 @@
   "type": "vector",
   "id": "provinces",
   "label": "Canada Provinces",
-  "source_url": "/src/layers/testFiles/sourceLayers/test-provinces.geojson",
+  "source_url": "/lib/openLayers/testFiles/sourceLayers/test-provinces.geojson",
   "visible": true,
   "fields": [
     { "id": "name",                   "label": "Province / Territory" },

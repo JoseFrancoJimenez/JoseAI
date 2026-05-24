@@ -38,7 +38,7 @@ export class AppMap {
     if (config.type === 'vector') {
       subscriptions.push(
         (layer as VectorAppLayer).on('change:variable', ({ variable }) =>
-          (native as unknown as INativeVectorLayer).setStyle(variable.renderer)
+          (native as unknown as INativeVectorLayer).setStyle(variable.renderer[0])
         )
       );
     }
