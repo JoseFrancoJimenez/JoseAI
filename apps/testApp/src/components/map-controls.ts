@@ -9,8 +9,8 @@ class MapControlsComponent extends BaseComponent {
   #layers: VectorAppLayer[] = [];
   #cleanupFns: (() => void)[] = [];
 
-  setup(provinces: VectorAppLayer, points: VectorAppLayer, airports: VectorAppLayer): void {
-    this.#layers = [provinces, points, airports];
+  setup(layers: VectorAppLayer[]): void {
+    this.#layers = layers;
   }
 
   html(): string {

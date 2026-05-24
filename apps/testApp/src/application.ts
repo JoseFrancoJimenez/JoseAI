@@ -18,23 +18,24 @@ const CANADA_EXTENT = transformExtent([-141.0, 41.7, -60.6, 78.1], 'EPSG:4326', 
 class Application extends BaseComponent {
   static readonly tagName = 'app-root';
 
+  #map!: AppMap;
+
   html(): string {
     return `<div class="app-map"></div>`;
   }
 
-  initialize(parent: HTMLElement): void {
-    parent.appendChild(this);
-    const map = this.#buildMap();
-    const { provinces, points, airports } = this.#addLayers(map);
-    this.#mountControls(provinces, points, airports);
-    this.#mountPopup(map);
+  initialize(): void {
+    this.#buildMap();
+    this.#addLayers();
+    this.#mountControls();
+    this.#mountPopup();
   }
 
   protected bindEvents(): void {}
   protected cleanup(): void {}
 
-  #buildMap(): AppMap {
-    const appMap = new AppMap({
+  #buildMap(): void {
+    this.#map = new AppMap({
       target: this.querySelector<HTMLElement>('.app-map')!,
       center: fromLonLat([-96.8, 71.4]) as [number, number],
       zoom: 3,
@@ -43,30 +44,26 @@ class Application extends BaseComponent {
       minZoom: 3,
     });
 
-    appMap.once('postrender', () => {
-      appMap.map.getView().fit(CANADA_EXTENT, { padding: [20, 20, 20, 20] });
+    this.#map.once('postrender', () => {
+      this.#map.map.getView().fit(CANADA_EXTENT, { padding: [20, 20, 20, 20] });
     });
-
-    return appMap;
   }
 
-  #addLayers(map: AppMap): { provinces: VectorAppLayer; points: VectorAppLayer; airports: VectorAppLayer } {
-    return {
-      provinces: map.addLayer(provincesConfig as unknown as VectorLayerConfig) as VectorAppLayer,
-      points:    map.addLayer(pointsConfig    as unknown as VectorLayerConfig) as VectorAppLayer,
-      airports:  map.addLayer(airportsConfig  as unknown as VectorLayerConfig) as VectorAppLayer,
-    };
+  #addLayers(): void {
+    this.#map.addLayer(provincesConfig as unknown as VectorLayerConfig);
+    this.#map.addLayer(pointsConfig    as unknown as VectorLayerConfig);
+    this.#map.addLayer(airportsConfig  as unknown as VectorLayerConfig);
   }
 
-  #mountControls(provinces: VectorAppLayer, points: VectorAppLayer, airports: VectorAppLayer): void {
+  #mountControls(): void {
     const controls = document.createElement(MapControlsComponent.tagName) as MapControlsComponent;
-    controls.setup(provinces, points, airports);
+    controls.setup(this.#map.getLayers() as VectorAppLayer[]);
     this.appendChild(controls);
   }
 
-  #mountPopup(map: AppMap): void {
+  #mountPopup(): void {
     const popup = document.createElement(MapPopupComponent.tagName) as MapPopupComponent;
-    popup.setup(map);
+    popup.setup(this.#map);
     this.appendChild(popup);
   }
 }
