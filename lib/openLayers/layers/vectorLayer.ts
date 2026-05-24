@@ -1,35 +1,25 @@
 import { extractFillColor } from '../openLayers.ts';
-import { BaseAppLayer, type BaseLayerEvents, type NativeLayer } from './baseLayer.ts';
+import { AppLayer, type BaseLayerEvents } from './baseLayer.ts';
 import type { VectorLayerConfig, FieldConfig, VariableConfig, Legend, LegendItem, RendererRule } from './types.ts';
-
-interface NativeVectorLayer extends NativeLayer {
-  setStyle(style: unknown): void;
-}
 
 export interface VectorLayerEvents extends BaseLayerEvents {
   'change:variable': { variable: VariableConfig };
 }
 
-/**
- * Vector layer that displays GeoJSON features with style variations.
- * Supports multiple rendering "variables" that can be switched dynamically.
- */
-export class VectorAppLayer extends BaseAppLayer<VectorLayerConfig, NativeVectorLayer, VectorLayerEvents> {
+export class VectorAppLayer extends AppLayer<VectorLayerConfig, VectorLayerEvents> {
   #variable: VariableConfig;
 
   static override EVENTS = {
-    ...BaseAppLayer.EVENTS,
+    ...AppLayer.EVENTS,
     CHANGE_VARIABLE: 'change:variable',
   } as const;
 
-  constructor(config: VectorLayerConfig, nativeLayer: NativeVectorLayer) {
-    super(config, nativeLayer);
+  constructor(config: VectorLayerConfig) {
+    super(config);
     this.#variable = VectorAppLayer.getVariable(config, config.default_variable);
   }
 
-  get fields(): FieldConfig[] {
-    return this.config.fields;
-  }
+  get fields(): FieldConfig[] { return this.config.fields; }
 
   get legend(): Legend {
     const defaultSubLabel = this.config.fields.find(f => f.id === this.#variable.id)?.label ?? '';
@@ -40,25 +30,12 @@ export class VectorAppLayer extends BaseAppLayer<VectorLayerConfig, NativeVector
     };
   }
 
-  get variables(): VariableConfig[] {
-    return this.config.variables;
-  }
+  get variables(): VariableConfig[] { return this.config.variables; }
 
-  get currentVariableId(): string {
-    return this.#variable.id;
-  }
+  get variable(): VariableConfig { return this.#variable; }
 
-  get variable(): VariableConfig {
-    return this.#variable;
-  }
-
-  /**
-   * Sets the active style variable by ID, updates the layer styling, and emits 'change:variable'.
-   * Throws if the variable ID is not found.
-   */
-  set variable(variableId: string) {
-    const variable = VectorAppLayer.getVariable(this.config, variableId);
-    this.nativeLayer.setStyle(variable.renderer);
+  setVariable(id: string): void {
+    const variable = VectorAppLayer.getVariable(this.config, id);
     this.#variable = variable;
     this.emit('change:variable', { variable });
   }

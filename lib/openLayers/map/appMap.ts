@@ -1,70 +1,70 @@
-import { createMap, type MapConfig, type OLBaseLayer } from './openLayers.ts';
-import type { BaseAppLayer } from './layers/baseLayer.ts';
+import type { Subscription } from '../../components/evented.ts';
+import { createMap, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
+import { createAppLayer, createNativeLayer, type INativeVectorLayer } from './layerFactory.ts';
+import type { AppLayer } from '../layers/baseLayer.ts';
+import type { VectorAppLayer } from '../layers/vectorLayer.ts';
+import type { LayerConfig } from '../layers/types.ts';
 
-/**
- * Manages the map instance and its layers.
- */
+interface LayerEntry {
+  layer: AppLayer;
+  native: OLBaseLayer;
+  subscriptions: Subscription[];
+}
+
 export class AppMap {
-  readonly #map: ReturnType<typeof createMap>;
-  readonly #layers = new Map<string, BaseAppLayer>();
+  readonly #map: OLMap;
+  readonly #layers = new Map<string, LayerEntry>();
 
-  /**
-   * Creates a new map manager with the given configuration
-   */
   constructor(config: MapConfig) {
     this.#map = createMap(config);
   }
 
-  /**
-   * Gets the underlying OpenLayers map instance
-   */
-  get map(): ReturnType<typeof createMap> {
-    return this.#map;
-  }
+  get map(): OLMap { return this.#map; }
 
-  /**
-   * Adds a layer to the map.
-   */
-  addLayer(layer: BaseAppLayer): void {
-    if (this.#layers.has(layer.id)) {
-      console.warn(`Layer "${layer.id}" is already on the map.`);
-      return;
+  addLayer(config: LayerConfig): AppLayer {
+    if (this.#layers.has(config.id)) {
+      console.warn(`Layer "${config.id}" is already on the map.`);
+      return this.#layers.get(config.id)!.layer;
     }
-    this.#map.addLayer(layer.nativeLayer as OLBaseLayer);
-    this.#layers.set(layer.id, layer);
-  }
 
-  /**
-   * Removes a layer from the map.
-   */
-  removeLayer(layer: BaseAppLayer): void {
-    if (!this.#layers.has(layer.id)) {
-      console.warn(`Layer "${layer.id}" not found.`);
-      return;
+    const native = createNativeLayer(config);
+    const layer = createAppLayer(config);
+
+    const subscriptions: Subscription[] = [
+      layer.on('change:visible', ({ visible }) => native.setVisible(visible)),
+      layer.on('change:opacity', ({ opacity }) => native.setOpacity(opacity)),
+    ];
+
+    if (config.type === 'vector') {
+      subscriptions.push(
+        (layer as VectorAppLayer).on('change:variable', ({ variable }) =>
+          (native as unknown as INativeVectorLayer).setStyle(variable.renderer)
+        )
+      );
     }
-    this.#map.removeLayer(layer.nativeLayer as OLBaseLayer);
-    this.#layers.delete(layer.id);
+
+    this.#map.addLayer(native);
+    this.#layers.set(config.id, { layer, native, subscriptions });
+    return layer;
   }
 
-  /**
-   * Gets a layer by ID, or undefined if not found
-   */
-  getLayer(id: string): BaseAppLayer | undefined {
-    return this.#layers.get(id);
+  removeLayer(id: string): void {
+    const entry = this.#layers.get(id);
+    if (!entry) return;
+    entry.subscriptions.forEach(s => s.remove());
+    this.#map.removeLayer(entry.native);
+    this.#layers.delete(id);
   }
 
-  /**
-   * Gets all layers currently on the map
-   */
-  getLayers(): BaseAppLayer[] {
-    return [...this.#layers.values()];
+  getLayer(id: string): AppLayer | undefined {
+    return this.#layers.get(id)?.layer;
   }
 
-  /**
-   * Finds an application layer by its underlying native layer instance,
-   * or undefined if not found
-   */
-  getLayerByNativeLayer(nativeLayer: OLBaseLayer): BaseAppLayer | undefined {
-    return [...this.#layers.values()].find(l => l.nativeLayer === nativeLayer);
+  getLayers(): AppLayer[] {
+    return [...this.#layers.values()].map(e => e.layer);
+  }
+
+  getNativeLayer(id: string): OLBaseLayer | undefined {
+    return this.#layers.get(id)?.native;
   }
 }
