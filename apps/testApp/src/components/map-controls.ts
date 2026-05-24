@@ -1,42 +1,36 @@
 import './map-controls.css';
 import type { VectorAppLayer } from '@lib/openLayers/layers/vectorLayer.ts';
 import { BaseComponent } from './base-component.ts';
+import { LegendComponent } from './legend.ts';
 
 class MapControlsComponent extends BaseComponent {
   static readonly tagName = 'map-controls';
 
-  #provinces: VectorAppLayer | null = null;
-  #points: VectorAppLayer | null = null;
-  #airports: VectorAppLayer | null = null;
+  #layers: VectorAppLayer[] = [];
   #cleanupFns: (() => void)[] = [];
 
   setup(provinces: VectorAppLayer, points: VectorAppLayer, airports: VectorAppLayer): void {
-    this.#provinces = provinces;
-    this.#points = points;
-    this.#airports = airports;
+    this.#layers = [provinces, points, airports];
   }
 
   html(): string {
-    if (!this.#provinces || !this.#points || !this.#airports) return '';
+    if (!this.#layers.length) return '';
     return `
       <div class="map-controls-panel">
-        ${this.#rowHtml('Provinces',          this.#checkboxHtml('provinces-visible', this.#provinces.visible))}
-        ${this.#rowHtml('Provinces variable', this.#selectHtml('provinces-variable',  this.#provinces))}
-        ${this.#rowHtml('Points',             this.#checkboxHtml('points-visible',    this.#points.visible))}
-        ${this.#rowHtml('Points variable',    this.#selectHtml('points-variable',     this.#points))}
-        ${this.#rowHtml('Airports',           this.#checkboxHtml('airports-visible',  this.#airports.visible))}
-        ${this.#rowHtml('Airports variable',  this.#selectHtml('airports-variable',   this.#airports))}
+        ${this.#layers.map(l => this.#layerBlockHtml(l)).join('')}
       </div>
     `;
   }
 
   protected bindEvents(): void {
-    this.#wireCheckbox('provinces-visible', this.#provinces!);
-    this.#wireSelect('provinces-variable',  this.#provinces!);
-    this.#wireCheckbox('points-visible',    this.#points!);
-    this.#wireSelect('points-variable',     this.#points!);
-    this.#wireCheckbox('airports-visible',  this.#airports!);
-    this.#wireSelect('airports-variable',   this.#airports!);
+    for (const layer of this.#layers) {
+      this.#wireCheckbox(`${layer.id}-visible`, layer);
+      this.#wireSelect(`${layer.id}-variable`, layer);
+
+      const legend = document.createElement(LegendComponent.tagName) as LegendComponent;
+      legend.setup([layer]);
+      this.querySelector(`#${layer.id}-legend`)!.appendChild(legend);
+    }
   }
 
   protected cleanup(): void {
@@ -44,24 +38,20 @@ class MapControlsComponent extends BaseComponent {
     this.#cleanupFns = [];
   }
 
-  #rowHtml(label: string, controlHtml: string): string {
+  #layerBlockHtml(layer: VectorAppLayer): string {
     return `
-      <div class="map-controls-row">
-        <label>${label}</label>
-        ${controlHtml}
+      <div class="layer-block">
+        <div class="layer-block-title">${layer.label}</div>
+        <div class="layer-block-row">
+          <input type="checkbox" id="${layer.id}-visible" ${layer.visible ? 'checked' : ''}>
+          <label for="${layer.id}-visible">Visible</label>
+          <select id="${layer.id}-variable" class="layer-block-select">
+            ${layer.variables.map(v => `<option value="${v.id}"${v.id === layer.variable.id ? ' selected' : ''}>${v.id}</option>`).join('')}
+          </select>
+        </div>
+        <div id="${layer.id}-legend"></div>
       </div>
     `;
-  }
-
-  #checkboxHtml(id: string, checked: boolean): string {
-    return `<input type="checkbox" id="${id}" ${checked ? 'checked' : ''}>`;
-  }
-
-  #selectHtml(id: string, layer: VectorAppLayer): string {
-    const options = layer.variables
-      .map(v => `<option value="${v.id}"${v.id === layer.variable.id ? ' selected' : ''}>${v.id}</option>`)
-      .join('');
-    return `<select id="${id}">${options}</select>`;
   }
 
   #wireCheckbox(id: string, layer: VectorAppLayer): void {

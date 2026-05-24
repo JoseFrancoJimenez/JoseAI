@@ -9,6 +9,7 @@ import type { VectorAppLayer } from '@lib/openLayers/layers/vectorLayer.ts';
 import type { VectorLayerConfig } from '@lib/openLayers/layers/types.ts';
 import { BaseComponent } from './components/base-component.ts';
 import { MapControlsComponent } from './components/map-controls.ts';
+import { MapPopupComponent } from './components/map-popup.ts';
 
 import provincesConfig from './testData/layers/provinces.json';
 import pointsConfig from './testData/layers/points.json';
@@ -28,6 +29,7 @@ class Application extends BaseComponent {
     const map = this.#buildMap();
     const { provinces, points, airports } = this.#addLayers(map);
     this.#mountControls(provinces, points, airports);
+    this.#mountPopup(map);
   }
 
   protected bindEvents(): void {}
@@ -63,6 +65,12 @@ class Application extends BaseComponent {
     const controls = document.createElement(MapControlsComponent.tagName) as MapControlsComponent;
     controls.setup(provinces, points, airports);
     this.appendChild(controls);
+  }
+
+  #mountPopup(map: AppMap): void {
+    const popup = document.createElement(MapPopupComponent.tagName) as MapPopupComponent;
+    popup.setup(map);
+    this.appendChild(popup);
   }
 }
 

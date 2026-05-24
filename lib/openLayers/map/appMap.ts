@@ -3,9 +3,15 @@ import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } fr
 import { createAppLayer, createNativeLayer } from './layerFactory.ts';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
+import type { FeatureLike } from 'ol/Feature.js';
 import type { AppLayer } from '../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../layers/vectorLayer.ts';
 import type { LayerConfig } from '../layers/types.ts';
+
+export interface HitTestResult {
+  layer: AppLayer;
+  features: FeatureLike[];
+}
 
 interface LayerEntry {
   layer: AppLayer;
@@ -74,5 +80,22 @@ export class AppMap {
 
   getNativeLayer(id: string): OLBaseLayer | undefined {
     return this.#layers.get(id)?.native;
+  }
+
+  hitTest(pixel: [number, number]): HitTestResult[] {
+    const results: HitTestResult[] = [];
+    const nativeToApp = new Map<OLBaseLayer, AppLayer>();
+    for (const entry of this.#layers.values()) nativeToApp.set(entry.native, entry.layer);
+
+    this.#map.forEachFeatureAtPixel(pixel, (feature, layer) => {
+      if (!layer) return;
+      const appLayer = nativeToApp.get(layer as OLBaseLayer);
+      if (!appLayer) return;
+      let result = results.find(r => r.layer === appLayer);
+      if (!result) { result = { layer: appLayer, features: [] }; results.push(result); }
+      result.features.push(feature as FeatureLike);
+    });
+
+    return results;
   }
 }
