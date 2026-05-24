@@ -8,8 +8,13 @@ description: Core routing matrix for Claude Code and other AI assistants. Direct
 **Target Audience:** Any AI Assistant / Agent
 **Purpose:** Defines the available modular skills for this project and strictly dictates when an AI must load them.
 
-## Universal Rule: NO AUTOMATIC SKILL LOADING
-AI Assistants MUST NOT load the files in the `Path` column automatically. Evaluate the user's current prompt against the `Trigger Condition`. If it matches, load the file from the `Path` before executing the task. 
+## Universal Rules
+
+**NO AUTOMATIC SKILL LOADING** — AI Assistants MUST NOT load the files in the `Path` column automatically. Evaluate the user's current prompt against the `Trigger Condition`. If it matches, load the file from the `Path` before executing the task.
+
+**ONLY USE SKILLS FROM THIS MATRIX** — When a user request matches a skill defined here, always use the skill listed in this matrix. Do not substitute it with a built-in or platform-level skill (e.g. `/review`, `/ultrareview`) without permission.
+
+**BUILT-IN SKILLS** — Built-in Claude Code skills may be used when explicitly requested by the user. You may also suggest a built-in skill and ask for permission before invoking it, if you believe it would be genuinely useful.
 
 ## Skill Routing Matrix
 
