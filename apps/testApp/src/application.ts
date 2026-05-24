@@ -22,7 +22,8 @@ class Application extends BaseComponent {
     return `<div class="app-map"></div>`;
   }
 
-  initialize(): void {
+  initialize(parent: HTMLElement): void {
+    parent.appendChild(this);
     const map = this.#buildMap();
     const { provinces, points } = this.#addLayers(map);
     this.#mountControls(provinces, points);
