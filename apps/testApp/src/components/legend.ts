@@ -30,9 +30,8 @@ class LegendComponent extends BaseComponent {
         ${subLabel ? `<div class="legend-layer-sublabel">${subLabel}</div>` : ''}
         <div class="legend-items">
           ${items.map(item => {
-            const iconSrc = item.style?.['icon-src'] as string | undefined;
-            const swatch = iconSrc
-              ? `<img class="legend-icon" src="${iconSrc}" alt="">`
+            const swatch = item.symbol
+              ? `<img class="legend-icon" src="${item.symbol}" alt="">`
               : `<span class="legend-swatch" style="background-color:${item.color ?? 'transparent'}"></span>`;
             return `<div class="legend-item">${swatch}<span class="legend-item-label">${item.label}</span></div>`;
           }).join('')}

@@ -57,6 +57,6 @@ function getLegendItems(variable: VariableConfig): LegendItem[] {
   return (variable.renderer as RendererRule[]).map(rule => ({
     label: rule.label ?? getLabelFromFilter(rule.filter),
     color: rule.style ? extractFillColor(rule.style) : undefined,
-    style: rule.style,
+    symbol: rule.style?.['icon-src'] as string | undefined,
   }));
 }

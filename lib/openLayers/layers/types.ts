@@ -12,7 +12,7 @@ export interface FieldConfig {
 export interface LegendItem {
   label: string;
   color?: string;
-  style?: Record<string, unknown>;
+  symbol?: string;
 }
 
 /**
