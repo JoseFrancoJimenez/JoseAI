@@ -12,6 +12,7 @@ import { MapControlsComponent } from './components/map-controls.ts';
 
 import provincesConfig from './testData/layers/provinces.json';
 import pointsConfig from './testData/layers/points.json';
+import airportsConfig from './testData/layers/airports.json';
 
 const CANADA_EXTENT = transformExtent([-141.0, 41.7, -60.6, 78.1], 'EPSG:4326', 'EPSG:3857');
 
@@ -25,8 +26,8 @@ class Application extends BaseComponent {
   initialize(parent: HTMLElement): void {
     parent.appendChild(this);
     const map = this.#buildMap();
-    const { provinces, points } = this.#addLayers(map);
-    this.#mountControls(provinces, points);
+    const { provinces, points, airports } = this.#addLayers(map);
+    this.#mountControls(provinces, points, airports);
   }
 
   protected bindEvents(): void {}
@@ -50,16 +51,17 @@ class Application extends BaseComponent {
     return appMap;
   }
 
-  #addLayers(map: AppMap): { provinces: VectorAppLayer; points: VectorAppLayer } {
+  #addLayers(map: AppMap): { provinces: VectorAppLayer; points: VectorAppLayer; airports: VectorAppLayer } {
     return {
       provinces: map.addLayer(provincesConfig as unknown as VectorLayerConfig) as VectorAppLayer,
       points:    map.addLayer(pointsConfig    as unknown as VectorLayerConfig) as VectorAppLayer,
+      airports:  map.addLayer(airportsConfig  as unknown as VectorLayerConfig) as VectorAppLayer,
     };
   }
 
-  #mountControls(provinces: VectorAppLayer, points: VectorAppLayer): void {
+  #mountControls(provinces: VectorAppLayer, points: VectorAppLayer, airports: VectorAppLayer): void {
     const controls = document.createElement(MapControlsComponent.tagName) as MapControlsComponent;
-    controls.setup(provinces, points);
+    controls.setup(provinces, points, airports);
     this.appendChild(controls);
   }
 }

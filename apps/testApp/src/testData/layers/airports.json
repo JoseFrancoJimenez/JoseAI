@@ -1,0 +1,91 @@
+{
+  "type": "vector",
+  "id": "airports",
+  "label": "Canadian Airports",
+  "source": {
+    "type": "esrijson",
+    "url": "https://maps-cartes.services.geo.ca/server_serveur/rest/services/TC/canadian_airports_w_air_navigation_services_en/MapServer/0"
+  },
+  "visible": true,
+  "fields": [
+    { "id": "AIRPORT",  "label": "Airport Name" },
+    { "id": "IATA",     "label": "IATA Code" },
+    { "id": "ICAO",     "label": "ICAO Code" },
+    { "id": "TYPE",     "label": "Airport Type" },
+    { "id": "CITY",     "label": "City" },
+    { "id": "PROVINCE", "label": "Province / Territory" }
+  ],
+  "default_variable": "type",
+  "variables": [
+    {
+      "id": "type",
+      "renderer": [
+        {
+          "filter": ["==", ["get", "TYPE"], "Control Tower"],
+          "style": { "icon-src": "/icons/airport-control-tower.png", "icon-width": 25, "icon-height": 25 }
+        },
+        {
+          "filter": ["==", ["get", "TYPE"], "Control Tower / Flight Service Station"],
+          "style": { "icon-src": "/icons/airport-control-tower-fss.png", "icon-width": 25, "icon-height": 25 }
+        },
+        {
+          "filter": ["==", ["get", "TYPE"], "Flight Service Station"],
+          "style": { "icon-src": "/icons/airport-fss.png", "icon-width": 20, "icon-height": 20 }
+        }
+      ],
+      "legend": {
+        "label": "Airport Type",
+        "items": [
+          { "label": "Control Tower",                          "color": "#e31a1c" },
+          { "label": "Control Tower / Flight Service Station", "color": "#ff7f00" },
+          { "label": "Flight Service Station",                 "color": "#1f78b4" }
+        ]
+      }
+    },
+    {
+      "id": "province",
+      "renderer": [
+        {
+          "circle-radius": 6,
+          "circle-fill-color": [
+            "match", ["get", "PROVINCE"],
+            "AB", "#1f78b4",
+            "BC", "#33a02c",
+            "MB", "#e31a1c",
+            "NB", "#ff7f00",
+            "NL", "#6a3d9a",
+            "NS", "#a6cee3",
+            "NT", "#b2df8a",
+            "NU", "#fb9a99",
+            "ON", "#fdbf6f",
+            "PE", "#cab2d6",
+            "QC", "#ffff99",
+            "SK", "#b15928",
+            "YT", "#8dd3c7",
+            "#cccccc"
+          ],
+          "circle-stroke-color": "#555555",
+          "circle-stroke-width": 1
+        }
+      ],
+      "legend": {
+        "label": "Province / Territory",
+        "items": [
+          { "label": "Alberta (AB)",                  "color": "#1f78b4" },
+          { "label": "British Columbia (BC)",          "color": "#33a02c" },
+          { "label": "Manitoba (MB)",                  "color": "#e31a1c" },
+          { "label": "New Brunswick (NB)",             "color": "#ff7f00" },
+          { "label": "Newfoundland & Labrador (NL)",  "color": "#6a3d9a" },
+          { "label": "Nova Scotia (NS)",               "color": "#a6cee3" },
+          { "label": "Northwest Territories (NT)",    "color": "#b2df8a" },
+          { "label": "Nunavut (NU)",                   "color": "#fb9a99" },
+          { "label": "Ontario (ON)",                   "color": "#fdbf6f" },
+          { "label": "Prince Edward Island (PE)",     "color": "#cab2d6" },
+          { "label": "Québec (QC)",                    "color": "#ffff99" },
+          { "label": "Saskatchewan (SK)",              "color": "#b15928" },
+          { "label": "Yukon (YT)",                     "color": "#8dd3c7" }
+        ]
+      }
+    }
+  ]
+}

@@ -37,14 +37,38 @@ export function extractFillColor(style: Record<string, unknown>): string | undef
 }
 
 /**
- * Converts our renderer array to OL flat style format.
- * RendererRule objects (with nested `style`, `label`, `else`) are flattened;
- * plain flat style objects pass through unchanged.
+ * Converts our renderer array to an OL FlatStyleLike value.
+ *
+ * OL supports two array forms:
+ *  - FlatStyle[]  — plain style objects applied to every feature
+ *  - Rule[]       — { filter?, else?, style } objects for conditional rendering
+ *
+ * filter/else/style are only honoured on Rule objects, not on FlatStyle objects.
+ * So when any renderer item carries filter, else, or a nested style, we emit
+ * Rule[] so OL evaluates conditions correctly.
  */
 export function toOLStyle(renderer: unknown[]): unknown[] {
+  const needsRules = renderer.some(r =>
+    typeof r === 'object' && r !== null &&
+    ('filter' in (r as object) || 'style' in (r as object) || 'else' in (r as object))
+  );
+
+  if (!needsRules) return renderer;
+
   return renderer.map(rule => {
-    if (typeof rule !== 'object' || rule === null || !('style' in (rule as object))) return rule;
-    const { filter, style } = rule as { filter?: unknown; style: Record<string, unknown> };
-    return filter !== undefined ? { filter, ...style } : { ...style };
+    if (typeof rule !== 'object' || rule === null) return rule;
+    const r = rule as Record<string, unknown>;
+
+    if ('style' in r) {
+      const { filter, style, else: isElse } = r as { filter?: unknown; style: unknown; else?: boolean };
+      const out: Record<string, unknown> = { style };
+      if (filter !== undefined) out['filter'] = filter;
+      if (isElse) out['else'] = true;
+      return out;
+    }
+
+    // Flat style object with a top-level filter — wrap into Rule format
+    const { filter, ...styleProps } = r as { filter?: unknown; [k: string]: unknown };
+    return filter !== undefined ? { filter, style: styleProps } : { style: r };
   });
 }

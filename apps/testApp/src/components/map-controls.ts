@@ -7,21 +7,25 @@ class MapControlsComponent extends BaseComponent {
 
   #provinces: VectorAppLayer | null = null;
   #points: VectorAppLayer | null = null;
+  #airports: VectorAppLayer | null = null;
   #cleanupFns: (() => void)[] = [];
 
-  setup(provinces: VectorAppLayer, points: VectorAppLayer): void {
+  setup(provinces: VectorAppLayer, points: VectorAppLayer, airports: VectorAppLayer): void {
     this.#provinces = provinces;
     this.#points = points;
+    this.#airports = airports;
   }
 
   html(): string {
-    if (!this.#provinces || !this.#points) return '';
+    if (!this.#provinces || !this.#points || !this.#airports) return '';
     return `
       <div class="map-controls-panel">
         ${this.#rowHtml('Provinces',          this.#checkboxHtml('provinces-visible', this.#provinces.visible))}
         ${this.#rowHtml('Provinces variable', this.#selectHtml('provinces-variable',  this.#provinces))}
         ${this.#rowHtml('Points',             this.#checkboxHtml('points-visible',    this.#points.visible))}
         ${this.#rowHtml('Points variable',    this.#selectHtml('points-variable',     this.#points))}
+        ${this.#rowHtml('Airports',           this.#checkboxHtml('airports-visible',  this.#airports.visible))}
+        ${this.#rowHtml('Airports variable',  this.#selectHtml('airports-variable',   this.#airports))}
       </div>
     `;
   }
@@ -31,6 +35,8 @@ class MapControlsComponent extends BaseComponent {
     this.#wireSelect('provinces-variable',  this.#provinces!);
     this.#wireCheckbox('points-visible',    this.#points!);
     this.#wireSelect('points-variable',     this.#points!);
+    this.#wireCheckbox('airports-visible',  this.#airports!);
+    this.#wireSelect('airports-variable',   this.#airports!);
   }
 
   protected cleanup(): void {
