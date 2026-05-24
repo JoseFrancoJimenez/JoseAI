@@ -10,10 +10,6 @@ export default class Component<TEvents extends object = Record<string, object>> 
     return this.#evented.on(event, handler);
   }
 
-  off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void {
-    this.#evented.off(event, handler);
-  }
-
   protected emit<K extends keyof TEvents & string>(event: K, data: TEvents[K]): void {
     this.#evented.emit(event, data);
   }
