@@ -1,9 +1,13 @@
-import type { Subscription } from '../../components/evented.ts';
-import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
-import { createAppLayer, createNativeLayer } from './layerFactory.ts';
+import TileLayer from 'ol/layer/Tile.js';
+import OSM from 'ol/source/OSM.js';
+import { unByKey } from 'ol/Observable.js';
+import type { EventsKey } from 'ol/events.js';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
 import type { FeatureLike } from 'ol/Feature.js';
+import type { Subscription } from '../../components/evented.ts';
+import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
+import { createAppLayer, createNativeLayer } from './layerFactory.ts';
 import type { AppLayer } from '../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../layers/vectorLayer.ts';
 import type { LayerConfig } from '../layers/types.ts';
@@ -22,12 +26,31 @@ interface LayerEntry {
 export class AppMap {
   readonly #map: OLMap;
   readonly #layers = new Map<string, LayerEntry>();
+  #baseLayer: OLBaseLayer;
 
   constructor(config: MapConfig) {
     this.#map = createMap(config);
+    this.#baseLayer = new TileLayer({ source: new OSM(), zIndex: 0 });
+    this.#map.addLayer(this.#baseLayer);
   }
 
   get map(): OLMap { return this.#map; }
+
+  setBaseLayer(layer: OLBaseLayer): void {
+    this.#map.removeLayer(this.#baseLayer);
+    this.#baseLayer = layer;
+    this.#map.getLayers().insertAt(0, layer);
+  }
+
+  on(type: string, handler: (e: unknown) => void): Subscription {
+    const key = this.#map.on(type as any, handler as any) as EventsKey;
+    return { remove: () => unByKey(key) };
+  }
+
+  once(type: string, handler: (e: unknown) => void): Subscription {
+    const key = this.#map.once(type as any, handler as any) as EventsKey;
+    return { remove: () => unByKey(key) };
+  }
 
   addLayer(config: LayerConfig): AppLayer {
     if (this.#layers.has(config.id)) {

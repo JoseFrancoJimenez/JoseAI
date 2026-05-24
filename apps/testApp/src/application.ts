@@ -1,7 +1,5 @@
 import 'ol/ol.css';
 import './application.css';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
 import { fromLonLat, transformExtent } from 'ol/proj';
 
 import { AppMap } from '@lib/openLayers/map/appMap.ts';
@@ -45,8 +43,7 @@ class Application extends BaseComponent {
       minZoom: 3,
     });
 
-    appMap.map.addLayer(new TileLayer({ source: new OSM(), zIndex: 0 }));
-    appMap.map.once('postrender', () => {
+    appMap.once('postrender', () => {
       appMap.map.getView().fit(CANADA_EXTENT, { padding: [20, 20, 20, 20] });
     });
 
