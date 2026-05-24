@@ -1,2 +1,2 @@
-Read the global instructions at /agent.md
+Read the global instructions at .ai/agent.md
 ModelID = CLAUDE
