@@ -107,7 +107,9 @@ class AppMap extends Evented<AppMapEvents> {
     if (config.type === 'vector') {
       const vLayer = layer as VectorAppLayer;
       const nativeVector = native as OLVectorLayer;
-      nativeVector.setStyle(toOLStyle(vLayer.variable.renderer) as unknown as StyleLike);
+      if (vLayer.variable) {
+        nativeVector.setStyle(toOLStyle(vLayer.variable.renderer) as unknown as StyleLike);
+      }
       subscriptions.push(
         vLayer.on('change:variable', ({ variable }) =>
           nativeVector.setStyle(toOLStyle(variable.renderer) as unknown as StyleLike)

@@ -82,8 +82,8 @@ export interface VectorLayerConfig extends BaseLayerConfig {
   type: 'vector';
   source: VectorSourceConfig;
   fields: FieldConfig[];
-  default_variable: string;
-  variables: VariableConfig[];
+  default_variable?: string;
+  variables?: VariableConfig[];
 }
 
 export interface ImageLayerConfig extends BaseLayerConfig {
