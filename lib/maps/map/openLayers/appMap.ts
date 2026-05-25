@@ -6,7 +6,7 @@ import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
 import type { FeatureLike } from 'ol/Feature.js';
 import type { Subscription } from '../../../components/evented.ts';
-import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from './openLayers.ts';
+import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer, type OLMapEventType } from './openLayers.ts';
 import { createAppLayer, createNativeLayer } from './layerFactory.ts';
 import type { AppLayer } from '../../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../../layers/vectorLayer.ts';
@@ -42,12 +42,12 @@ export class AppMap {
     this.#map.getLayers().insertAt(0, layer);
   }
 
-  on(type: string, handler: (e: unknown) => void): Subscription {
+  on(type: OLMapEventType, handler: (e: unknown) => void): Subscription {
     const key = this.#map.on(type as any, handler as any) as EventsKey;
     return { remove: () => unByKey(key) };
   }
 
-  once(type: string, handler: (e: unknown) => void): Subscription {
+  once(type: OLMapEventType, handler: (e: unknown) => void): Subscription {
     const key = this.#map.once(type as any, handler as any) as EventsKey;
     return { remove: () => unByKey(key) };
   }

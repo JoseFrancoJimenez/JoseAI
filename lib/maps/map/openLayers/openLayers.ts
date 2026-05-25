@@ -5,6 +5,13 @@ import type { Extent } from 'ol/extent.js';
 
 export type { OLMap, OLBaseLayer };
 
+/** Union of valid OL Map event type strings. Extend as new event types are needed. */
+export type OLMapEventType =
+  | 'click' | 'dblclick' | 'singleclick' | 'pointerdrag' | 'pointermove'
+  | 'movestart' | 'moveend'
+  | 'precompose' | 'postcompose' | 'prerender' | 'postrender' | 'rendercomplete'
+  | 'change' | 'error' | 'propertychange';
+
 export interface MapConfig {
   target: string | HTMLElement;
   center: [number, number];

@@ -1,4 +1,4 @@
-import Component from '../../components/component.ts';
+import Evented from '../../components/evented.ts';
 import type { BaseLayerConfig, FieldConfig, Legend } from './types.ts';
 
 export interface BaseLayerEvents {
@@ -9,12 +9,12 @@ export interface BaseLayerEvents {
 export abstract class AppLayer<
   TConfig extends BaseLayerConfig = BaseLayerConfig,
   TEvents extends BaseLayerEvents = BaseLayerEvents,
-> extends Component<TEvents> {
+> extends Evented<TEvents> {
   protected readonly config: TConfig;
   #visible: boolean;
   #opacity: number;
 
-  static override EVENTS = {
+  static EVENTS = {
     CHANGE_VISIBLE: 'change:visible',
     CHANGE_OPACITY: 'change:opacity',
   } as const;

@@ -3,24 +3,19 @@ export interface Subscription {
   remove(): void;
 }
 
-/** Contract for any object that can emit typed events. Use this when composing instead of extending. */
+/** Consumer-side contract: subscribe and unsubscribe. Emitting is intentionally internal to the emitter. */
 export interface IEvented<TEvents extends object = Record<string, object>> {
   on<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription;
   off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void;
-  emit<K extends keyof TEvents & string>(event: K, data: TEvents[K]): void;
 }
 
 /**
- * Generic event emitter. Subclasses declare an event map for fully typed `on`/`off`/`emit`.
+ * Generic event emitter. Extend this class and declare a typed event map.
+ * `emit` is protected — only the subclass fires events; consumers use `on`/`off`.
  *
  * ```ts
- * interface MyEvents {
- *   'change:name': { name: string };
- * }
- *
- * class MyClass extends Evented<MyEvents> {
- *   static override EVENTS = { CHANGE_NAME: 'change:name' };
- * }
+ * interface MyEvents { 'change:name': { name: string }; }
+ * class MyClass extends Evented<MyEvents> {}
  * ```
  */
 export default class Evented<TEvents extends object = Record<string, object>> implements IEvented<TEvents> {
@@ -40,7 +35,7 @@ export default class Evented<TEvents extends object = Record<string, object>> im
     else this.#handlers.delete(event);
   }
 
-  emit<K extends keyof TEvents & string>(event: K, data: TEvents[K]): void {
+  protected emit<K extends keyof TEvents & string>(event: K, data: TEvents[K]): void {
     this.#handlers.get(event)?.slice().forEach(h => h(data));
   }
 }
