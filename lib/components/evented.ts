@@ -6,6 +6,7 @@ export interface Subscription {
 /** Consumer-side contract: subscribe and unsubscribe. Emitting is intentionally internal to the emitter. */
 export interface IEvented<TEvents extends object = Record<string, object>> {
   on<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription;
+  once<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription;
   off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void;
 }
 
@@ -25,6 +26,11 @@ export default class Evented<TEvents extends object = Record<string, object>> im
     if (!this.#handlers.has(event)) this.#handlers.set(event, []);
     this.#handlers.get(event)!.push(handler);
     return { remove: () => this.off(event, handler) };
+  }
+
+  once<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription {
+    const sub = this.on(event, (payload) => { handler(payload); sub.remove(); });
+    return sub;
   }
 
   off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void {
