@@ -1,5 +1,5 @@
 import Evented from '../../components/evented.ts';
-import type { BaseLayerConfig, FieldConfig, Legend } from './types.ts';
+import type { BaseLayerConfig, Legend } from './types.ts';
 
 export interface BaseLayerEvents {
   'change:visible': { visible: boolean };
@@ -40,8 +40,6 @@ export abstract class AppLayer<
     this.#opacity = value;
     this.emit('change:opacity', { opacity: value } as TEvents['change:opacity']);
   }
-
-  get fields(): FieldConfig[] { return []; }
 
   get legend(): Legend {
     return {

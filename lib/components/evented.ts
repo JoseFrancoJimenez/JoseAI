@@ -6,13 +6,17 @@ export interface Subscription {
 /** Consumer-side contract: subscribe and unsubscribe. Emitting is intentionally internal to the emitter. */
 export interface IEvented<TEvents extends object = Record<string, object>> {
   on<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription;
+  /**
+   * Subscribe to an event exactly once. The handler is automatically removed after the first fire.
+   * To cancel before the event fires, call `Subscription.remove()` on the returned value.
+   * Calling `off(event, handler)` will NOT cancel a once() subscription.
+   */
   once<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): Subscription;
-  off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void;
 }
 
 /**
  * Generic event emitter. Extend this class and declare a typed event map.
- * `emit` is protected — only the subclass fires events; consumers use `on`/`off`.
+ * `emit` and `off` are protected — only the subclass fires events or removes handlers; consumers use `on`/`once`.
  *
  * ```ts
  * interface MyEvents { 'change:name': { name: string }; }
@@ -33,7 +37,7 @@ export default class Evented<TEvents extends object = Record<string, object>> im
     return sub;
   }
 
-  off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void {
+  protected off<K extends keyof TEvents & string>(event: K, handler: (payload: TEvents[K]) => void): void {
     const handlers = this.#handlers.get(event);
     if (!handlers) return;
     const filtered = handlers.filter(h => h !== handler);

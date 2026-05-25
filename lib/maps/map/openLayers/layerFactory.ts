@@ -15,6 +15,8 @@ import { ImageAppLayer } from '../../layers/imageLayer.ts';
 import { TileAppLayer } from '../../layers/tileLayer.ts';
 import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig, VectorSourceConfig, WFSSourceConfig, EsriJSONSourceConfig } from '../../layers/types.ts';
 
+const ESRI_WEB_MERCATOR_WKID = 102100;
+
 export function createAppLayer(config: LayerConfig): AppLayer {
   switch (config.type) {
     case 'vector': return new VectorAppLayer(config);
@@ -84,12 +86,12 @@ function createEsriJSONSource(source: EsriJSONSourceConfig): VectorSource {
         geometry: JSON.stringify({
           xmin: extent[0], ymin: extent[1],
           xmax: extent[2], ymax: extent[3],
-          spatialReference: { wkid: 102100 },
+          spatialReference: { wkid: ESRI_WEB_MERCATOR_WKID },
         }),
         geometryType: 'esriGeometryEnvelope',
-        inSR: '102100',
+        inSR: String(ESRI_WEB_MERCATOR_WKID),
         outFields: '*',
-        outSR: '102100',
+        outSR: String(ESRI_WEB_MERCATOR_WKID),
       });
       return `${source.url}/query?${params}`;
     },

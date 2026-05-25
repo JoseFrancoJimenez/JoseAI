@@ -71,8 +71,7 @@ class AppMap extends Evented<AppMapEvents> {
 
   addLayer(config: LayerConfig): AppLayer {
     if (this.#layers.has(config.id)) {
-      console.warn(`Layer "${config.id}" is already on the map.`);
-      return this.#layers.get(config.id)!.layer;
+      throw new Error(`Layer "${config.id}" is already on the map.`);
     }
 
     const native = createNativeLayer(config);
