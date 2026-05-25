@@ -1,16 +1,20 @@
 import TileLayer from 'ol/layer/Tile.js';
 import OSM from 'ol/source/OSM.js';
-import { unByKey } from 'ol/Observable.js';
-import type { EventsKey } from 'ol/events.js';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
 import type { FeatureLike } from 'ol/Feature.js';
+import Evented from '../../../components/evented.ts';
 import type { Subscription } from '../../../components/evented.ts';
-import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer, type OLMapEventType } from './openLayers.ts';
+import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from './openLayers.ts';
 import { createAppLayer, createNativeLayer } from './layerFactory.ts';
 import type { AppLayer } from '../../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../../layers/vectorLayer.ts';
 import type { LayerConfig } from '../../layers/types.ts';
+
+export interface AppMapEvents {
+  'layer:added':   { layer: AppLayer };
+  'layer:removed': { layer: AppLayer };
+}
 
 export interface HitTestResult {
   layer: AppLayer;
@@ -23,33 +27,26 @@ interface LayerEntry {
   subscriptions: Subscription[];
 }
 
-export class AppMap {
-  readonly #map: OLMap;
+/** Manages the OpenLayers map instance, its AppLayer registry, and emits layer lifecycle events. */
+class AppMap extends Evented<AppMapEvents> {
+  readonly #nativeMap: OLMap;
   readonly #layers = new Map<string, LayerEntry>();
   #baseLayer: OLBaseLayer;
 
   constructor(config: MapConfig) {
-    this.#map = createMap(config);
+    super();
+    this.#nativeMap = createMap(config);
     this.#baseLayer = new TileLayer({ source: new OSM(), zIndex: 0 });
-    this.#map.addLayer(this.#baseLayer);
+    this.#nativeMap.addLayer(this.#baseLayer);
   }
 
-  get map(): OLMap { return this.#map; }
+  /** The underlying OL map instance. Use for OL-specific operations (event subscriptions, overlays, view access). */
+  get nativeMap(): OLMap { return this.#nativeMap; }
 
   setBaseLayer(layer: OLBaseLayer): void {
-    this.#map.removeLayer(this.#baseLayer);
+    this.#nativeMap.removeLayer(this.#baseLayer);
     this.#baseLayer = layer;
-    this.#map.getLayers().insertAt(0, layer);
-  }
-
-  on(type: OLMapEventType, handler: (e: unknown) => void): Subscription {
-    const key = this.#map.on(type as any, handler as any) as EventsKey;
-    return { remove: () => unByKey(key) };
-  }
-
-  once(type: OLMapEventType, handler: (e: unknown) => void): Subscription {
-    const key = this.#map.once(type as any, handler as any) as EventsKey;
-    return { remove: () => unByKey(key) };
+    this.#nativeMap.getLayers().insertAt(0, layer);
   }
 
   addLayer(config: LayerConfig): AppLayer {
@@ -80,8 +77,9 @@ export class AppMap {
       );
     }
 
-    this.#map.addLayer(native);
+    this.#nativeMap.addLayer(native);
     this.#layers.set(config.id, { layer, native, subscriptions });
+    this.emit('layer:added', { layer });
     return layer;
   }
 
@@ -89,8 +87,9 @@ export class AppMap {
     const entry = this.#layers.get(id);
     if (!entry) return;
     entry.subscriptions.forEach(s => s.remove());
-    this.#map.removeLayer(entry.native);
+    this.#nativeMap.removeLayer(entry.native);
     this.#layers.delete(id);
+    this.emit('layer:removed', { layer: entry.layer });
   }
 
   getLayer(id: string): AppLayer | undefined {
@@ -110,7 +109,7 @@ export class AppMap {
     const nativeToApp = new Map<OLBaseLayer, AppLayer>();
     for (const entry of this.#layers.values()) nativeToApp.set(entry.native, entry.layer);
 
-    this.#map.forEachFeatureAtPixel(pixel, (feature, layer) => {
+    this.#nativeMap.forEachFeatureAtPixel(pixel, (feature, layer) => {
       if (!layer) return;
       const appLayer = nativeToApp.get(layer as OLBaseLayer);
       if (!appLayer) return;
@@ -122,3 +121,5 @@ export class AppMap {
     return results;
   }
 }
+
+export { AppMap };

@@ -39,9 +39,9 @@ class MapPopupComponent extends BaseComponent {
       offset: [0, -8],
       stopEvent: true,
     });
-    this.#appMap.map.addOverlay(this.#overlay);
+    this.#appMap.nativeMap.addOverlay(this.#overlay);
 
-    this.#clickKey = this.#appMap.map.on('click', (e) => {
+    this.#clickKey = this.#appMap.nativeMap.on('click', (e) => {
       const results = this.#appMap!.hitTest(e.pixel as [number, number]);
       results.length ? this.#show(results, e.coordinate as [number, number]) : this.#hide();
     }) as EventsKey;
@@ -55,7 +55,7 @@ class MapPopupComponent extends BaseComponent {
       this.#clickKey = null;
     }
     if (this.#overlay && this.#appMap) {
-      this.#appMap.map.removeOverlay(this.#overlay);
+      this.#appMap.nativeMap.removeOverlay(this.#overlay);
       this.#overlay = null;
     }
   }

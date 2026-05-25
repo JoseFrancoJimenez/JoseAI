@@ -44,8 +44,8 @@ class Application extends BaseComponent {
       minZoom: 3,
     });
 
-    this.#map.once('postrender', () => {
-      this.#map.map.getView().fit(CANADA_EXTENT, { padding: [20, 20, 20, 20] });
+    this.#map.nativeMap.once('postrender', () => {
+      this.#map.nativeMap.getView().fit(CANADA_EXTENT, { padding: [20, 20, 20, 20] });
     });
   }
 
