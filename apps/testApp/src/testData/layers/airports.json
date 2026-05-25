@@ -33,7 +33,14 @@
           "style": { "icon-src": "/icons/airport-fss.png", "icon-width": 20, "icon-height": 20 }
         }
       ],
-      "legend": { "label": "Airport Type" }
+      "legend": {
+        "label": "Airport Type",
+        "items": [
+          { "label": "Control Tower",                          "symbol": "/icons/airport-control-tower.png" },
+          { "label": "Control Tower / Flight Service Station", "symbol": "/icons/airport-control-tower-fss.png" },
+          { "label": "Flight Service Station",                 "symbol": "/icons/airport-fss.png" }
+        ]
+      }
     },
     {
       "id": "province",
