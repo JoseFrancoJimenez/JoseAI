@@ -5,17 +5,27 @@ import type { Extent } from 'ol/extent.js';
 
 export type { OLMap, OLBaseLayer };
 
+/** Construction options for an AppMap instance. */
 export interface MapConfig {
+  /** DOM element or element ID to render the map into. */
   target: string | HTMLElement;
+  /** Initial map center in the map's projection coordinates. */
   center: [number, number];
+  /** Initial zoom level. */
   zoom: number;
+  /** EPSG code for the map projection. Defaults to `'EPSG:3857'`. */
   projection?: string;
+  /** Hard pan boundary for the view extent. */
   extent?: Extent;
+  /** When true, only the center point is constrained to the extent (not the full view). */
   constrainOnlyCenter?: boolean;
+  /** Minimum allowed zoom level. */
   minZoom?: number;
+  /** Maximum allowed zoom level. */
   maxZoom?: number;
 }
 
+/** Creates an OL Map with a configured View from a {@link MapConfig}. */
 export function createMap(config: MapConfig): OLMap {
   return new OLMap({
     target: config.target,

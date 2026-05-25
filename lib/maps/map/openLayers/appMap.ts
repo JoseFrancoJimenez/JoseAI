@@ -13,13 +13,19 @@ import type { AppLayer } from '../../layers/baseLayer.ts';
 import type { VectorAppLayer } from '../../layers/vectorLayer.ts';
 import type { LayerConfig } from '../../layers/types.ts';
 
+/** Typed event map for {@link AppMap}. */
 export interface AppMapEvents {
+  /** Fired after a layer is registered and added to the OL map. */
   'layer:added':   { layer: AppLayer };
+  /** Fired after a layer is removed from the OL map and its subscriptions cleaned up. */
   'layer:removed': { layer: AppLayer };
 }
 
+/** One entry in the array returned by {@link AppMap.hitTest}. */
 export interface HitTestResult {
+  /** The app layer that owns the hit features. */
   layer: AppLayer;
+  /** Features found at the queried pixel, in render order. */
   features: FeatureLike[];
 }
 
@@ -47,6 +53,10 @@ class AppMap extends Evented<AppMapEvents> {
   /** The underlying OL map instance. Use for OL-specific operations (overlays, view access, etc.). */
   get nativeMap(): OLMap { return this.#nativeMap; }
 
+  /**
+   * Subscribe to an AppMap event or any native OL map event through a single API.
+   * Own events (`layer:added`, `layer:removed`) are typed; all other strings are forwarded to OL.
+   */
   on<K extends keyof AppMapEvents & string>(event: K, handler: (payload: AppMapEvents[K]) => void): Subscription;
   on(event: string, handler: (payload: any) => void): Subscription;
   on(event: string, handler: (payload: any) => void): Subscription {
@@ -55,6 +65,10 @@ class AppMap extends Evented<AppMapEvents> {
     return { remove: () => unByKey(key) };
   }
 
+  /**
+   * Subscribe to an event exactly once. Own events are typed; all other strings are forwarded to OL.
+   * Cancel before the event fires by calling `Subscription.remove()` on the returned value.
+   */
   once<K extends keyof AppMapEvents & string>(event: K, handler: (payload: AppMapEvents[K]) => void): Subscription;
   once(event: string, handler: (payload: any) => void): Subscription;
   once(event: string, handler: (payload: any) => void): Subscription {
@@ -63,12 +77,17 @@ class AppMap extends Evented<AppMapEvents> {
     return { remove: () => unByKey(key) };
   }
 
+  /** Replaces the base tile layer rendered at z-index 0 (e.g. swap OSM for a custom basemap). */
   setBaseLayer(layer: OLBaseLayer): void {
     this.#nativeMap.removeLayer(this.#baseLayer);
     this.#baseLayer = layer;
     this.#nativeMap.getLayers().insertAt(0, layer);
   }
 
+  /**
+   * Creates an AppLayer and its paired OL layer from `config`, registers both, and emits `layer:added`.
+   * @throws {Error} If a layer with the same `config.id` is already on the map.
+   */
   addLayer(config: LayerConfig): AppLayer {
     if (this.#layers.has(config.id)) {
       throw new Error(`Layer "${config.id}" is already on the map.`);
@@ -102,6 +121,7 @@ class AppMap extends Evented<AppMapEvents> {
     return layer;
   }
 
+  /** Removes a layer by ID, cleans up its event subscriptions, and emits `layer:removed`. No-op if the ID is not found. */
   removeLayer(id: string): void {
     const entry = this.#layers.get(id);
     if (!entry) return;
@@ -111,18 +131,22 @@ class AppMap extends Evented<AppMapEvents> {
     this.emit('layer:removed', { layer: entry.layer });
   }
 
+  /** Returns the AppLayer registered under `id`, or `undefined` if not found. */
   getLayer(id: string): AppLayer | undefined {
     return this.#layers.get(id)?.layer;
   }
 
+  /** Returns all registered AppLayers in insertion order. */
   getLayers(): AppLayer[] {
     return [...this.#layers.values()].map(e => e.layer);
   }
 
+  /** Returns the raw OL layer paired with `id`, or `undefined` if not found. Use for OL-specific operations not exposed by AppLayer. */
   getNativeLayer(id: string): OLBaseLayer | undefined {
     return this.#layers.get(id)?.native;
   }
 
+  /** Returns all features at the given screen pixel, grouped by their AppLayer. */
   hitTest(pixel: [number, number]): HitTestResult[] {
     const results: HitTestResult[] = [];
     const nativeToApp = new Map<OLBaseLayer, AppLayer>();

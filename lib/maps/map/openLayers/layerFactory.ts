@@ -17,6 +17,7 @@ import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig,
 
 const ESRI_WEB_MERCATOR_WKID = 102100;
 
+/** Creates the typed {@link AppLayer} subclass that corresponds to the given layer config. */
 export function createAppLayer(config: LayerConfig): AppLayer {
   switch (config.type) {
     case 'vector': return new VectorAppLayer(config);
@@ -25,6 +26,7 @@ export function createAppLayer(config: LayerConfig): AppLayer {
   }
 }
 
+/** Creates the native OL layer that corresponds to the given layer config. */
 export function createNativeLayer(config: LayerConfig): OLBaseLayer {
   switch (config.type) {
     case 'vector': return createNativeVectorLayer(config);
