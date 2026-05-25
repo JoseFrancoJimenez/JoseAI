@@ -1,7 +1,6 @@
 import './map-popup.css';
 import Overlay from 'ol/Overlay.js';
-import { unByKey } from 'ol/Observable.js';
-import type { EventsKey } from 'ol/events.js';
+import type { Subscription } from '@lib/components/evented.ts';
 import type { AppMap, HitTestResult } from '@lib/maps/map/openLayers/appMap.ts';
 import { BaseComponent } from './base-component.ts';
 
@@ -10,7 +9,7 @@ class MapPopupComponent extends BaseComponent {
 
   #appMap: AppMap | null = null;
   #overlay: Overlay | null = null;
-  #clickKey: EventsKey | null = null;
+  #clickSub: Subscription | null = null;
   readonly #el: HTMLElement;
 
   constructor() {
@@ -41,18 +40,18 @@ class MapPopupComponent extends BaseComponent {
     });
     this.#appMap.nativeMap.addOverlay(this.#overlay);
 
-    this.#clickKey = this.#appMap.nativeMap.on('click', (e) => {
+    this.#clickSub = this.#appMap.on('click', (e) => {
       const results = this.#appMap!.hitTest(e.pixel as [number, number]);
       results.length ? this.#show(results, e.coordinate as [number, number]) : this.#hide();
-    }) as EventsKey;
+    });
 
     this.#el.querySelector('.popup-close')!.addEventListener('click', () => this.#hide());
   }
 
   protected cleanup(): void {
-    if (this.#clickKey) {
-      unByKey(this.#clickKey);
-      this.#clickKey = null;
+    if (this.#clickSub) {
+      this.#clickSub.remove();
+      this.#clickSub = null;
     }
     if (this.#overlay && this.#appMap) {
       this.#appMap.nativeMap.removeOverlay(this.#overlay);

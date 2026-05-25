@@ -1,5 +1,7 @@
 import TileLayer from 'ol/layer/Tile.js';
 import OSM from 'ol/source/OSM.js';
+import { unByKey } from 'ol/Observable.js';
+import type { EventsKey } from 'ol/events.js';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
 import type { FeatureLike } from 'ol/Feature.js';
@@ -29,6 +31,8 @@ interface LayerEntry {
 
 /** Manages the OpenLayers map instance, its AppLayer registry, and emits layer lifecycle events. */
 class AppMap extends Evented<AppMapEvents> {
+  static readonly #OWN_EVENTS = new Set<string>(['layer:added', 'layer:removed']);
+
   readonly #nativeMap: OLMap;
   readonly #layers = new Map<string, LayerEntry>();
   #baseLayer: OLBaseLayer;
@@ -40,8 +44,24 @@ class AppMap extends Evented<AppMapEvents> {
     this.#nativeMap.addLayer(this.#baseLayer);
   }
 
-  /** The underlying OL map instance. Use for OL-specific operations (event subscriptions, overlays, view access). */
+  /** The underlying OL map instance. Use for OL-specific operations (overlays, view access, etc.). */
   get nativeMap(): OLMap { return this.#nativeMap; }
+
+  on<K extends keyof AppMapEvents & string>(event: K, handler: (payload: AppMapEvents[K]) => void): Subscription;
+  on(event: string, handler: (payload: any) => void): Subscription;
+  on(event: string, handler: (payload: any) => void): Subscription {
+    if (AppMap.#OWN_EVENTS.has(event)) return super.on(event as keyof AppMapEvents & string, handler);
+    const key = this.#nativeMap.on(event as any, handler) as EventsKey;
+    return { remove: () => unByKey(key) };
+  }
+
+  once<K extends keyof AppMapEvents & string>(event: K, handler: (payload: AppMapEvents[K]) => void): Subscription;
+  once(event: string, handler: (payload: any) => void): Subscription;
+  once(event: string, handler: (payload: any) => void): Subscription {
+    if (AppMap.#OWN_EVENTS.has(event)) return super.once(event as keyof AppMapEvents & string, handler);
+    const key = this.#nativeMap.once(event as any, handler) as EventsKey;
+    return { remove: () => unByKey(key) };
+  }
 
   setBaseLayer(layer: OLBaseLayer): void {
     this.#nativeMap.removeLayer(this.#baseLayer);
