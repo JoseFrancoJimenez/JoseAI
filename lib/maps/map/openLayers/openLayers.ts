@@ -31,11 +31,6 @@ export function createMap(config: MapConfig): OLMap {
   });
 }
 
-export function extractFillColor(style: Record<string, unknown>): string | undefined {
-  const color = style['circle-fill-color'] ?? style['fill-color'];
-  return typeof color === 'string' ? color : undefined;
-}
-
 /**
  * Converts our renderer array to an OL FlatStyleLike value.
  *
@@ -67,7 +62,6 @@ export function toOLStyle(renderer: unknown[]): unknown[] {
       return out;
     }
 
-    // Flat style object with a top-level filter — wrap into Rule format
     const { filter, ...styleProps } = r as { filter?: unknown; [k: string]: unknown };
     return filter !== undefined ? { filter, style: styleProps } : { style: r };
   });

@@ -9,11 +9,11 @@ import EsriJSON from 'ol/format/EsriJSON.js';
 import { bbox } from 'ol/loadingstrategy.js';
 import type OLBaseLayer from 'ol/layer/Base.js';
 
-import type { AppLayer } from '../layers/baseLayer.ts';
-import { VectorAppLayer } from '../layers/vectorLayer.ts';
-import { ImageAppLayer } from '../layers/imageLayer.ts';
-import { TileAppLayer } from '../layers/tileLayer.ts';
-import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig, VectorSourceConfig, WFSSourceConfig, EsriJSONSourceConfig } from '../layers/types.ts';
+import type { AppLayer } from '../../layers/baseLayer.ts';
+import { VectorAppLayer } from '../../layers/vectorLayer.ts';
+import { ImageAppLayer } from '../../layers/imageLayer.ts';
+import { TileAppLayer } from '../../layers/tileLayer.ts';
+import type { LayerConfig, VectorLayerConfig, ImageLayerConfig, TileLayerConfig, VectorSourceConfig, WFSSourceConfig, EsriJSONSourceConfig } from '../../layers/types.ts';
 
 export function createAppLayer(config: LayerConfig): AppLayer {
   switch (config.type) {

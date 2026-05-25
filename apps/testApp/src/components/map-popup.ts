@@ -2,7 +2,7 @@ import './map-popup.css';
 import Overlay from 'ol/Overlay.js';
 import { unByKey } from 'ol/Observable.js';
 import type { EventsKey } from 'ol/events.js';
-import type { AppMap, HitTestResult } from '@lib/openLayers/map/appMap.ts';
+import type { AppMap, HitTestResult } from '@lib/maps/map/openLayers/appMap.ts';
 import { BaseComponent } from './base-component.ts';
 
 class MapPopupComponent extends BaseComponent {

@@ -1,5 +1,5 @@
 import './legend.css';
-import type { VectorAppLayer } from '@lib/openLayers/layers/vectorLayer.ts';
+import type { VectorAppLayer } from '@lib/maps/layers/vectorLayer.ts';
 import { BaseComponent } from './base-component.ts';
 
 class LegendComponent extends BaseComponent {

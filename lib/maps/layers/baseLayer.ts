@@ -32,7 +32,6 @@ export abstract class AppLayer<
   get visible(): boolean { return this.#visible; }
   set visible(value: boolean) {
     this.#visible = value;
-    // Cast is safe: TEvents extends BaseLayerEvents guarantees this key exists with this shape.
     this.emit('change:visible', { visible: value } as TEvents['change:visible']);
   }
 

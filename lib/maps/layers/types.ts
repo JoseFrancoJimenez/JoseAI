@@ -1,42 +1,26 @@
-/**
- * Configuration for a field in a layer's dataset
- */
 export interface FieldConfig {
   id: string;
   label: string;
 }
 
-/**
- * An entry in a layer's legend
- */
 export interface LegendItem {
   label: string;
   color?: string;
   symbol?: string;
 }
 
-/**
- * The full legend object returned by a layer's legend getter.
- * Use Partial<Legend> in config when some fields should fall back to layer defaults.
- */
 export interface Legend {
   label: string;
   subLabel: string;
   items: LegendItem[];
 }
 
-/**
- * Configuration for a variable (style variant) within a layer
- */
 export interface VariableConfig {
   id: string;
   renderer: unknown[];
   legend?: Partial<Legend>;
 }
 
-/**
- * Base configuration shared by all layer types
- */
 export interface BaseLayerConfig {
   id: string;
   label: string;

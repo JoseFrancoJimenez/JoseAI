@@ -5,12 +5,12 @@ import type { EventsKey } from 'ol/events.js';
 import type OLVectorLayer from 'ol/layer/Vector.js';
 import type { StyleLike } from 'ol/style/Style.js';
 import type { FeatureLike } from 'ol/Feature.js';
-import type { Subscription } from '../../components/evented.ts';
-import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from '../openLayers.ts';
+import type { Subscription } from '../../../components/evented.ts';
+import { createMap, toOLStyle, type MapConfig, type OLMap, type OLBaseLayer } from './openLayers.ts';
 import { createAppLayer, createNativeLayer } from './layerFactory.ts';
-import type { AppLayer } from '../layers/baseLayer.ts';
-import type { VectorAppLayer } from '../layers/vectorLayer.ts';
-import type { LayerConfig } from '../layers/types.ts';
+import type { AppLayer } from '../../layers/baseLayer.ts';
+import type { VectorAppLayer } from '../../layers/vectorLayer.ts';
+import type { LayerConfig } from '../../layers/types.ts';
 
 export interface HitTestResult {
   layer: AppLayer;

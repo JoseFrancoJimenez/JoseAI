@@ -1,6 +1,5 @@
-import { extractFillColor } from '../openLayers.ts';
 import { AppLayer, type BaseLayerEvents } from './baseLayer.ts';
-import type { VectorLayerConfig, FieldConfig, VariableConfig, Legend, LegendItem, RendererRule } from './types.ts';
+import type { VectorLayerConfig, FieldConfig, VariableConfig, Legend } from './types.ts';
 
 export interface VectorLayerEvents extends BaseLayerEvents {
   'change:variable': { variable: VariableConfig };
@@ -26,7 +25,7 @@ export class VectorAppLayer extends AppLayer<VectorLayerConfig, VectorLayerEvent
     return {
       label: this.config.legend?.label ?? this.config.label,
       subLabel: this.config.legend?.subLabel ?? defaultSubLabel,
-      items: getLegendItems(this.#variable),
+      items: this.#variable.legend?.items ?? [],
     };
   }
 
@@ -47,16 +46,3 @@ export class VectorAppLayer extends AppLayer<VectorLayerConfig, VectorLayerEvent
   }
 }
 
-function getLabelFromFilter(filter: unknown): string {
-  if (Array.isArray(filter) && filter.length >= 3) return String(filter[filter.length - 1]);
-  return '';
-}
-
-function getLegendItems(variable: VariableConfig): LegendItem[] {
-  if (variable.legend?.items?.length) return variable.legend.items;
-  return (variable.renderer as RendererRule[]).map(rule => ({
-    label: rule.label ?? getLabelFromFilter(rule.filter),
-    color: rule.style ? extractFillColor(rule.style) : undefined,
-    symbol: rule.style?.['icon-src'] as string | undefined,
-  }));
-}

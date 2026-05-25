@@ -2,9 +2,9 @@ import 'ol/ol.css';
 import './application.css';
 import { fromLonLat, transformExtent } from 'ol/proj';
 
-import { AppMap } from '@lib/openLayers/map/appMap.ts';
-import type { VectorAppLayer } from '@lib/openLayers/layers/vectorLayer.ts';
-import type { VectorLayerConfig } from '@lib/openLayers/layers/types.ts';
+import { AppMap } from '@lib/maps/map/openLayers/appMap.ts';
+import type { VectorAppLayer } from '@lib/maps/layers/vectorLayer.ts';
+import type { VectorLayerConfig } from '@lib/maps/layers/types.ts';
 import { BaseComponent } from './components/base-component.ts';
 import { MapControlsComponent } from './components/map-controls.ts';
 import { MapPopupComponent } from './components/map-popup.ts';
