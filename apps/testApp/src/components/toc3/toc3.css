@@ -1,0 +1,33 @@
+toc-3 {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 100;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  font: 13px/1.6 sans-serif;
+  min-width: 220px;
+  max-height: calc(50vh - 40px);
+  overflow-y: auto;
+}
+
+toc-3 .tree-indent {
+  display: none;
+}
+
+toc-3 .tree-row {
+  cursor: default;
+  padding: 0;
+  border-radius: 0;
+}
+
+toc-3 .tree-row:hover {
+  background: none;
+}
+
+toc-3 .tree-item:last-child layer-block {
+  border-bottom: none;
+  padding-bottom: 0;
+}

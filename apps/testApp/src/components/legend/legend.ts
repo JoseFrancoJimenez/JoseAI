@@ -1,6 +1,6 @@
 import './legend.css';
 import type { VectorAppLayer } from '@lib/maps/layers/vectorLayer.ts';
-import { BaseComponent } from './base-component.ts';
+import { BaseComponent } from '@lib/components/base-component.ts';
 
 class LegendComponent extends BaseComponent {
   static readonly tagName = 'map-legend';

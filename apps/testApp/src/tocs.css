@@ -1,0 +1,162 @@
+/* ── TOC panel positioning ───────────────────────────────────── */
+
+/* Tree-structure TOC — top-right, uses the widget's default dark theme. */
+explorer-toc2 {
+  display: block;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+  width: 260px;
+  max-height: calc(100vh - 40px);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Layer-panel TOC — bottom-right. Overrides the widget's dark theme to light
+   to visually distinguish it from the explorer TOC above. */
+layer-toc2 {
+  display: block;
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 100;
+  width: 280px;
+  max-height: calc(50vh - 20px);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+
+  .toc-component {
+    max-height: calc(50vh - 20px);
+    background: #ffffff;
+    color: #2c2c2c;
+    font-family: system-ui, sans-serif;
+
+    .toc-list--nested { border-left-color: #e0e0e0; }
+    .toc-row:hover    { background: #f5f5f5; }
+    .toc-toggle       { color: #aaa; }
+    .toc-toggle:hover { color: #555; background: #eee; }
+  }
+}
+
+/* ── TOC node content ────────────────────────────────────────── */
+
+.toc-layer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  padding: 1px 0;
+}
+
+.toc-layer input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  accent-color: #4a90d9;
+  cursor: pointer;
+}
+
+.toc-layer-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toc-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.toc-group input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  accent-color: #4a90d9;
+  cursor: pointer;
+}
+
+.toc-group-name {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #8b95a8;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+/* ── Layer panel node content ────────────────────────────────── */
+
+.toc-layer-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 0 8px;
+  border-bottom: 1px solid #efefef;
+}
+
+.toc-node:last-child .toc-layer-block {
+  border-bottom: none;
+}
+
+.toc-layer-block-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.toc-layer-block-header input[type="checkbox"] {
+  flex-shrink: 0;
+  accent-color: #2e7dd1;
+  cursor: pointer;
+}
+
+.toc-layer-block-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: #1a1a1a;
+}
+
+.toc-layer-block-select {
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  background: #fafafa;
+  width: 100%;
+}
+
+.toc-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 2px;
+}
+
+.toc-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toc-legend-swatch {
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.toc-legend-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.toc-legend-label {
+  font-size: 11px;
+  color: #555;
+}

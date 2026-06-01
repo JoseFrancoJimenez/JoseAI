@@ -2,7 +2,7 @@ import './map-popup.css';
 import Overlay from 'ol/Overlay.js';
 import type { Subscription } from '@lib/components/evented.ts';
 import type { AppMap, HitTestResult } from '@lib/maps/map/openLayers/appMap.ts';
-import { BaseComponent } from './base-component.ts';
+import { BaseComponent } from '@lib/components/base-component.ts';
 
 class MapPopupComponent extends BaseComponent {
   static readonly tagName = 'map-popup';

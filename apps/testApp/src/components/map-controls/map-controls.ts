@@ -1,7 +1,7 @@
 import './map-controls.css';
 import type { VectorAppLayer } from '@lib/maps/layers/vectorLayer.ts';
-import { BaseComponent } from './base-component.ts';
-import { LegendComponent } from './legend.ts';
+import { BaseComponent } from '@lib/components/base-component.ts';
+import { LegendComponent } from '../legend/legend.ts';
 
 class MapControlsComponent extends BaseComponent {
   static readonly tagName = 'map-controls';
